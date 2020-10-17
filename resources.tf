@@ -1,45 +1,11 @@
-// Populated from environment variables via TF_VAR_public_key
-variable "public_key" {}
-
 resource "aws_key_pair" "nextcloud_keypair" {
     key_name = "nextcloud_keypair"
-    public_key = var.public_key
-}
-resource "aws_security_group" "nextcloud_http_globally_accessible" {
-    name = "nextcloud_http_globally_accessible"
-    ingress { 
-        from_port = 80    
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-    egress {
-        from_port = 0
-        to_port = 0
-        protocol = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-}
-
-resource "aws_security_group" "nextcloud_ingress_globally_accessible" {
-    name = "nextcloud_ingress_globally_accessible"
-    ingress { 
-        from_port = 22    
-        to_port = 22
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-    egress {
-        from_port = 0
-        to_port = 0
-        protocol = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
+    public_key = file(var.public_key_path)
 }
 
 resource "aws_instance" "nextcloud" {
-    ami = "ami-07bfe0a3ec9dfcffa"
-    instance_type = "t2.micro"
+    ami = var.ec2_ami 
+    instance_type = var.ec2_instance_type
     tags = {
         Name = "nextcloud-main"
     }
@@ -56,7 +22,7 @@ resource "aws_instance" "nextcloud" {
         connection {
             type = "ssh"
             user = "ubuntu"
-            private_key = file("~/.ssh/id_rsa")
+            private_key = file(var.private_key_path)
             host = aws_instance.nextcloud.public_ip
             agent = true
             timeout = "1m"
