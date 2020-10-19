@@ -15,7 +15,7 @@ variable "ec2_ami" {
 }
 
 variable "ec2_instance_type" {
-    default = "t2.micro"
+    default = "t2.nano"
 }
 
 variable "rds_instance_type" {
